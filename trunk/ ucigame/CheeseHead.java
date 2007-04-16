@@ -13,7 +13,7 @@ public class CheeseHead extends Ucigame
 	Stage[] stages;
 	
 	private int frame;   // The frame we're on.
-	private int currentStage = 0;
+	private int currentStage;
 	
 	
 	void setup()
@@ -25,19 +25,31 @@ public class CheeseHead extends Ucigame
 		canvas.background(0,125,255);
 		
 		frame = 0;
+		currentStage = 0;
 		
-		stages = new Stage[1];
+		stages = new Stage[2];
 		stages[0] = new Stage();
-		stages[0].addBrick(300,400);
+		stages[0].setDoor(250, 229);
+		stages[0].setPlayer(20, 438);
+		stages[0].setPooper(400,322);		stages[0].addBrick(300,400);
 		stages[0].addBrick(550, 300);
 //		stages[0].addBrick(80,90);
 		stages[0].addPlatform(500,450);
 		stages[0].addPlatform(400,400);
 		stages[0].addPlatform(300,350);
 		stages[0].addPlatform(200,300);
-		stages[0].setDoor(250, 229);
-		stages[0].setPlayer(20, 438);
-		stages[0].setPooper(400,322);
+
+		stages[1] = new Stage();
+		stages[1].setDoor(77, 9);
+		stages[1].setPooper(700, 472);
+		stages[1].setPlayer(20,438);
+		stages[1].addPlatform(20, 80);
+		stages[1].addPlatform(600, 400);
+		stages[1].addPlatform(600, 300);
+		stages[1].addPlatform(600, 200);
+		stages[1].addPlatform(600, 100);
+		stages[1].addPlatform(20, 180);
+		stages[1].addBrick(270, 284);
 		
 		startScene("MainGame");
 	}
@@ -78,7 +90,7 @@ public class CheeseHead extends Ucigame
 	{
 		canvas.clear();
 		canvas.color(0);
-//		canvas.font("Times", BOLD, 20);
+		canvas.font("Arial", BOLD, 30);
 		canvas.putText("ehm ... you win?", 300, 300);
 	}
 	
