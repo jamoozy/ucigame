@@ -94,7 +94,6 @@ public class CheeseHead extends Ucigame
 		canvas.putText("ehm ... you win?", 300, 300);
 	}
 	
-	
 	void drawScore()
 	{
 	}
@@ -118,7 +117,6 @@ public class CheeseHead extends Ucigame
 //		canvas.color(0);
 //		drawcross(20,438,10);
 	}
-
 	
 	private void drawrect(int x1, int y1, int x2, int y2)
 	{
@@ -134,12 +132,16 @@ public class CheeseHead extends Ucigame
 
 	void onKeyPressMainGame()
 	{
-		if (keyboard.key() == keyboard.F || keyboard.key() == keyboard.RIGHT)
+		if (keyboard.key() == keyboard.F || keyboard.key() == keyboard.RIGHT) {
+//			System.out.println("right");
 			stages[currentStage].player().moveRight();
-		else if (keyboard.key() == keyboard.S || keyboard.key() == keyboard.LEFT)
+		} else if (keyboard.key() == keyboard.S || keyboard.key() == keyboard.LEFT) {
+//			System.out.println("left");
 			stages[currentStage].player().moveLeft();
-		else if (keyboard.key() == keyboard.SPACE)
+		} else if (keyboard.key() == keyboard.SPACE) {
+//			System.out.println("jump");
 			stages[currentStage].player().jump();
+		}
 //		else if (keyboard.key() == keyboard.D)
 //			System.out.printf("player:(%d,%d)  door:(%d,%d)\n", player.x(), player.y(), door.x(), door.y());
 //		else if (keyboard.key() == keyboard.E)
@@ -228,6 +230,8 @@ public class CheeseHead extends Ucigame
 		public Player player() { return player; }
 		public Door door() { return door; }
 		public Pooper pooper() { return pooper; }
+		public int numBricks() { return numBricks; }
+		public int numPlatforms() { return numPlatforms; }
 		public Brick[] bricks()
 		{
 			Brick[] temp = new Brick[numBricks];
@@ -235,7 +239,6 @@ public class CheeseHead extends Ucigame
 				temp[i] = bricks[i];
 			return temp;
 		}
-		
 		public Platform[] platforms()
 		{
 			Platform[] temp = new Platform[numPlatforms];
@@ -287,15 +290,17 @@ public class CheeseHead extends Ucigame
 		{
 			y += yv;  // Take velocity into account;
 			yv += G;  // Adjust for gravity
+			
+			checkCollisions();
 
-			if (collides()) {
+//			if (collides()) {
 //				if (yv != 0)
 //					System.out.printf("Collision! %1.2f\n", yv);
-				grounded = true;
-				yv = 0;
-			} else {
-				grounded = false;
-			}
+//				grounded = true;
+//				yv = 0;
+//			} else {
+//				grounded = false;
+//			}
 			
 			// Play the appropriate animation or show the correct frame given
 			// the state of the player.
@@ -319,33 +324,59 @@ public class CheeseHead extends Ucigame
 			moving = false;
 		}
 		
-		private boolean collides()
+		private void checkCollisions()
 		{
 			if (y >= FLOOR - face.height() && yv > 0)
 			{
+//				System.out.println("floor-foot collision");
 				y = FLOOR - face.height();
 //				System.out.println("Hit floor.");
-				return true;
+				grounded = true;
+				yv = 0;
+				return;
 			}
 			
-			for (Platform p : stages[currentStage].platforms()) if (p.x() < x + face.width() && p.x() + p.width() > x && yv > 0 && approxEquals(p.y(), y + face.height()))
+			for (Platform p : stages[currentStage].platforms())
+				if (p.x() < x + face.width() && p.x() + p.width() > x && yv > 0 && p.y() >= y + face.height() && p.y() < y() + height() + yv)
 			{
+//				System.out.println("platform-foot collision");
 				y = p.y() - face.height();
 //				System.out.printf("%d < %d + %d && %d + %d > %d\n", platform.x(), sprite.x(), sprite.width(), platform.x(), platform.width(), sprite.x());
 //				System.out.println("Hit platform.");
-				return true;
+				grounded = true;
+				yv = 0;
+				return;
 			}
 			
-			for (Brick b : stages[currentStage].bricks()) if (b.x() < x + face.width() && b.x() + b.width() > x && yv > 0 && approxEquals(b.y(), y + face.height()))
+			for (Brick b : stages[currentStage].bricks())
 			{
-				y = b.y() - face.height();
-				return true;
+				if (b.x() < x + face.width() && b.x() + b.width() > x)
+				{
+					if (yv > 0 && b.y() >= y + face.height() && b.y() < y() + height() + yv)
+					{
+						System.out.println("block-foot collision");
+						y = b.y() - face.height();
+						yv = 0;
+						grounded = true;
+						return;
+					}
+					else if (yv < 0 && approxEquals(b.y() + b.height(), y))
+					{
+						System.out.println("block-head collision");
+						y = b.y() + b.height();
+						yv = 0;
+						grounded = false;
+						return;
+					}
+//					else
+//						System.out.printf("yv:%2.0f\nblock y+height:%d\ny:%2.0f\n", yv, b.y() + b.height(), y);
+				}
 			}
 //			System.out.printf("%d == %d + %d && %1.2f > 0\n", platform.y(), sprite.y(), sprite.height(), yv);
 //			System.out.printf("%d >= %d - %d && %1.2f > 0\n", face.y(), FLOOR, face.height(), yv);
 //			System.out.printf("%d < %1.2f + %d && %d + %d > %1.2f && %1.2f > 0 && %d == %1.2f + %d\n", platforms[1].x(), x, face.width(), platforms[1].x(), platforms[1].width(), x, yv, platforms[1].y(), y, face.height());
-
-			return false;
+			
+			grounded = false;
 		}
 			
 		private boolean approxEquals(double a, double b)
@@ -353,8 +384,16 @@ public class CheeseHead extends Ucigame
 			return Math.abs(a-b) <= yv;
 		}
 		
-		public void move(int x, int y)
+		private void move(int x, int y)
 		{
+			for (Brick b : stages[currentStage].bricks())
+			{
+				if (b.y() < y + height() && b.y() + b.height() > y && b.x() < x() + width() + x && b.x() + b.width() > x() + x)
+				{
+					moving = false;
+					return;
+				}
+			}
 			this.x += x;
 			this.y += y;
 			moving = true;
@@ -568,5 +607,10 @@ public class CheeseHead extends Ucigame
 		{
 			return sprite.width();
 		}		
+		
+		public int height()
+		{
+			return sprite.height();
+		}
 	}
 }
