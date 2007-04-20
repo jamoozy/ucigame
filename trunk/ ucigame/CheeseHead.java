@@ -1,3 +1,5 @@
+import ucigame.*;
+
 public class CheeseHead extends Ucigame
 {
 	public static final double G = .5; // gravity
@@ -16,7 +18,7 @@ public class CheeseHead extends Ucigame
 	private int currentStage;
 	
 	
-	void setup()
+	public void setup()
 	{
 		framerate(FPS);
 		window.size(800,600);
@@ -25,9 +27,9 @@ public class CheeseHead extends Ucigame
 		canvas.background(0,125,255);
 		
 		frame = 0;
-		currentStage = 0;
+		currentStage = 2;
 		
-		stages = new Stage[2];
+		stages = new Stage[3];
 		stages[0] = new Stage();
 		stages[0].setDoor(250, 229);
 		stages[0].setPlayer(20, 438);
@@ -51,6 +53,22 @@ public class CheeseHead extends Ucigame
 		stages[1].addPlatform(20, 180);
 		stages[1].addBrick(270, 284);
 		
+		stages[2] = new Stage();
+		stages[2].setDoor(700,429);
+		stages[2].setPooper(372, 472);
+		stages[2].setPlayer(20, 438);
+		stages[2].addBrick(80, 468);
+		stages[2].addBrick(80, 436);
+		stages[2].addBrick(80, 404);
+		stages[2].addBrick(80, 372);
+		stages[2].addBrick(80, 340);
+		stages[2].addBrick(80, 308);
+		stages[2].addBrick(0, 404);
+		stages[2].addPlatform(112, 308);
+		stages[2].addPlatform(263, 308);
+		stages[2].addPlatform(414, 308);
+		stages[2].addPlatform(565, 308);
+		stages[2].addBrick(716, 308);
 		startScene("MainGame");
 	}
 	
@@ -86,24 +104,23 @@ public class CheeseHead extends Ucigame
 //		player = new Player(20, 438);//	}
 
 	
-	void startScore()
+	public void startScore()
 	{
 		canvas.clear();
 		canvas.color(0);
-		canvas.font("Arial", BOLD, 30);
+//		canvas.font("Arial", BOLD, 30);
 		canvas.putText("ehm ... you win?", 300, 300);
 	}
 	
-	void drawScore()
+	public void drawScore()
 	{
 	}
 	
-	void startMainGame()
+	public void startMainGame()
 	{
-		
 	}
 	
-	void drawMainGame()
+	public void drawMainGame()
 	{
 		frame++;
 
@@ -130,15 +147,15 @@ public class CheeseHead extends Ucigame
 		canvas.line(x, y-l, x, y+l);
 	}
 
-	void onKeyPressMainGame()
+	public void onKeyPressMainGame()
 	{
-		if (keyboard.key() == keyboard.F || keyboard.key() == keyboard.RIGHT) {
+		if (keyboard.isDown(keyboard.F, keyboard.RIGHT)) {
 //			System.out.println("right");
 			stages[currentStage].player().moveRight();
-		} else if (keyboard.key() == keyboard.S || keyboard.key() == keyboard.LEFT) {
+		} else if (keyboard.isDown(keyboard.S, keyboard.LEFT)) {
 //			System.out.println("left");
 			stages[currentStage].player().moveLeft();
-		} else if (keyboard.key() == keyboard.SPACE) {
+		} if (keyboard.isDown(keyboard.SPACE)) {
 //			System.out.println("jump");
 			stages[currentStage].player().jump();
 		}
@@ -149,7 +166,10 @@ public class CheeseHead extends Ucigame
 //		else if (keyboard.key() == keyboard.D)
 //			player.move(0,Player.MOVE_SPEED);
 	}
-	
+	public void onKeyPressScore()
+	{
+//		if (keyboard.isDown(arg0))
+	}
 	
 	////////////////////////////////////////////////////////////////////////////
 	// ----------------------------- Stages --------------------------------- //
@@ -258,10 +278,10 @@ public class CheeseHead extends Ucigame
 		public static final int MOVE_SPEED = 5;
 		public static final int JUMP_SPEED = -10;
 		
-		private USprite face;
+		private Sprite face;
 //		private USprite side;
-		private USprite jump;
-		private USprite walk;
+		private Sprite jump;
+		private Sprite walk;
 		
 		private double x, y;          // coordinates of the player.
 		private double yv;            // y-velocity
@@ -271,7 +291,7 @@ public class CheeseHead extends Ucigame
 		
 		public Player(int x, int y)
 		{
-			UImage walkimage = getImage("images/playerwalk.png", 192);
+			Image walkimage = getImage("images/playerwalk.png", 192);
 			face = makeSprite(getImage("images/player.png", 192));
 //			side = makeSprite(getImage("images/playerside.png", 192));
 			jump = makeSprite(getImage("images/playerjump.png", 192));
@@ -288,9 +308,6 @@ public class CheeseHead extends Ucigame
 	
 		public void draw()
 		{
-			y += yv;  // Take velocity into account;
-			yv += G;  // Adjust for gravity
-			
 			checkCollisions();
 
 //			if (collides()) {
@@ -301,6 +318,9 @@ public class CheeseHead extends Ucigame
 //			} else {
 //				grounded = false;
 //			}
+			
+			y += yv;  // Take velocity into account;
+			yv += G;  // Adjust for gravity
 			
 			// Play the appropriate animation or show the correct frame given
 			// the state of the player.
@@ -336,8 +356,7 @@ public class CheeseHead extends Ucigame
 				return;
 			}
 			
-			for (Platform p : stages[currentStage].platforms())
-				if (p.x() < x + face.width() && p.x() + p.width() > x && yv > 0 && p.y() >= y + face.height() && p.y() < y() + height() + yv)
+			for (Platform p : stages[currentStage].platforms()) if (p.x() < x + face.width() && p.x() + p.width() > x && yv > 0 && p.y() >= y + face.height() && p.y() < y() + height() + yv)
 			{
 //				System.out.println("platform-foot collision");
 				y = p.y() - face.height();
@@ -354,15 +373,15 @@ public class CheeseHead extends Ucigame
 				{
 					if (yv > 0 && b.y() >= y + face.height() && b.y() < y() + height() + yv)
 					{
-						System.out.println("block-foot collision");
+//						System.out.println("block-foot collision");
 						y = b.y() - face.height();
 						yv = 0;
 						grounded = true;
 						return;
 					}
-					else if (yv < 0 && approxEquals(b.y() + b.height(), y))
+					else if (yv < 0 && b.y() + b.height() <= y() && b.y() + b.height() > y() + yv)
 					{
-						System.out.println("block-head collision");
+//						System.out.println("block-head collision");
 						y = b.y() + b.height();
 						yv = 0;
 						grounded = false;
@@ -379,24 +398,24 @@ public class CheeseHead extends Ucigame
 			grounded = false;
 		}
 			
-		private boolean approxEquals(double a, double b)
-		{
-			return Math.abs(a-b) <= yv;
-		}
+//		private boolean approxEquals(double a, double b)
+//		{
+//			return Math.abs(a-b) <= yv;
+//		}
 		
-		private void move(int x, int y)
+		private void move(int dx, int dy)
 		{
+			moving = true;
 			for (Brick b : stages[currentStage].bricks())
 			{
-				if (b.y() < y + height() && b.y() + b.height() > y && b.x() < x() + width() + x && b.x() + b.width() > x() + x)
+				if (b.y() < y() + height() && b.y() + b.height() > y() && b.x() < x() + width() + dx && b.x() + b.width() > x() + dx)
 				{
 					moving = false;
 					return;
 				}
 			}
-			this.x += x;
-			this.y += y;
-			moving = true;
+			this.x += dx;
+			this.y += dy;
 		}
 		
 		public void moveLeft()
@@ -461,7 +480,7 @@ public class CheeseHead extends Ucigame
 
 		public Pooper(int x, int y)
 		{
-			UImage image = getImage("images/pooper.png", 255);
+			Image image = getImage("images/pooper.png", 255);
 			sprite = makeSprite(image, 28, 28);
 			sprite.addFrames(image, 28, 0);
 			sprite.framerate(3);
@@ -533,7 +552,7 @@ public class CheeseHead extends Ucigame
 	{
 		public Door(int x, int y)
 		{
-			UImage image = getImage("images/door.png", 192);
+			Image image = getImage("images/door.png", 192);
 			sprite = makeSprite(image, 37, 71);
 			sprite.addFrames(image, 37,0 , 74,0 , 111,0 , 148,0);
 			sprite.framerate(1);
@@ -586,7 +605,7 @@ public class CheeseHead extends Ucigame
 	 */
 	private abstract class Collidable
 	{
-		protected USprite sprite;
+		protected Sprite sprite;
 		
 		public void draw()
 		{
