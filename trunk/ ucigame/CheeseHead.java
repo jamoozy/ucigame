@@ -2,8 +2,8 @@ import ucigame.*;
 
 public class CheeseHead extends Ucigame
 {
-	public static final double G = .5; // gravity
-	public static final int FLOOR = 500;
+	public static final double G = .5;    // gravity
+	public static final int FLOOR = 500;  // y-coord of the floor.
 	public static final int FPS = 20;
 
 //	private Brick[] bricks;
@@ -11,19 +11,20 @@ public class CheeseHead extends Ucigame
 //	private Player player;
 //	private Door door;
 //	private Pooper pooper;
-	
-	Stage[] stages;
-	
-	private int frame;   // The frame we're on.
-	private int currentStage;
-	
-	
+
+	Stage[] stages;            // All stages.
+
+	private int frame;         // The frame we're on.
+	private int currentStage;  // "pointer" in the array of stages to the current stage.
+
+	/**
+	 * Set up the window and stages.
+	 */
 	public void setup()
 	{
 		framerate(FPS);
 		window.size(800,600);
 		window.title("Cheese Head");
-//		window.showFPS();
 		canvas.background(0,125,255);
 		
 		frame = 0;
@@ -35,7 +36,6 @@ public class CheeseHead extends Ucigame
 		stages[0].setPlayer(20, 438);
 		stages[0].setPooper(400,322);		stages[0].addBrick(300,400);
 		stages[0].addBrick(550, 300);
-//		stages[0].addBrick(80,90);
 		stages[0].addPlatform(500,450);
 		stages[0].addPlatform(400,400);
 		stages[0].addPlatform(300,350);
@@ -56,7 +56,7 @@ public class CheeseHead extends Ucigame
 		stages[2] = new Stage();
 		stages[2].setDoor(700,429);
 		stages[2].setPooper(372, 472);
-		stages[2].setPlayer(20, 438);
+		stages[2].setPlayer(20, 439);
 		stages[2].addBrick(80, 468);
 		stages[2].addBrick(80, 436);
 		stages[2].addBrick(80, 404);
@@ -69,9 +69,15 @@ public class CheeseHead extends Ucigame
 		stages[2].addPlatform(414, 308);
 		stages[2].addPlatform(565, 308);
 		stages[2].addBrick(716, 308);
+		stages[2].addBrick(716, 340);
+		stages[2].addBrick(716, 372);
+		stages[2].addBrick(684, 372);
+		stages[2].addBrick(652, 404);
+		stages[2].addBrick(652, 436);
+		stages[2].addBrick(652, 468);
 		startScene("MainGame");
 	}
-	
+
 	
 	/**
 	 * What to do when the player has reached the goal door.
@@ -83,7 +89,7 @@ public class CheeseHead extends Ucigame
 			startScene("Score");
 		
 	}
-	
+
 //	void start()
 //	{
 //		bricks = new Brick[3];
@@ -103,7 +109,9 @@ public class CheeseHead extends Ucigame
 //
 //		player = new Player(20, 438);//	}
 
-	
+	/**
+	 * Puts out the message at the end.
+	 */
 	public void startScore()
 	{
 		canvas.clear();
@@ -112,14 +120,26 @@ public class CheeseHead extends Ucigame
 		canvas.putText("ehm ... you win?", 300, 300);
 	}
 	
+
+	/**
+	 * Updates the screen every frame during the score screen.
+	 */
 	public void drawScore()
 	{
 	}
 	
+
+	/**
+	 * Init-type stuff for the main game.
+	 */
 	public void startMainGame()
 	{
 	}
 	
+
+	/**
+	 * Draws everything during normal gameplay.
+	 */
 	public void drawMainGame()
 	{
 		frame++;
@@ -135,18 +155,39 @@ public class CheeseHead extends Ucigame
 //		drawcross(20,438,10);
 	}
 	
+
+	/**
+	 * Draws a rectangle from (x1,y1) to (x2,y2).
+	 * 
+	 * @param x1 X-coord of one corner.
+	 * @param y1 Y-coord of one corner.
+	 * @param x2 X-coord of the other corner.
+	 * @param y2 Y-coord of the other corner.
+	 */
 	private void drawrect(int x1, int y1, int x2, int y2)
 	{
 		for (int i = y1; i <= y2; i++)
 			canvas.line(x1, i, x2, i);
 	}
 	
+
+	/**
+	 * Draws a cross at (x,y) with a size of 2lx2l.
+	 * 
+	 * @param x The x-coordinate of the center.
+	 * @param y The y-coordinate of the center.
+	 * @param l Twice the height & width of the cross. 
+	 */
 	private void drawcross(int x, int y, int l)
 	{
 		canvas.line(x-l, y, x+l, y);
 		canvas.line(x, y-l, x, y+l);
 	}
 
+	/**
+	 * Control the player sprite.  F or LEFT moves left.  S or RIGHT moves right
+	 * D or DOWN pushes through a platform.  SPACE jumps.
+	 */
 	public void onKeyPressMainGame()
 	{
 		if (keyboard.isDown(keyboard.F, keyboard.RIGHT)) {
@@ -158,37 +199,52 @@ public class CheeseHead extends Ucigame
 		} if (keyboard.isDown(keyboard.SPACE)) {
 //			System.out.println("jump");
 			stages[currentStage].player().jump();
+		} if (keyboard.isDown(keyboard.D, keyboard.DOWN)) {
+//			System.out.println("down");
+			stages[currentStage].player().down();
 		}
-//		else if (keyboard.key() == keyboard.D)
-//			System.out.printf("player:(%d,%d)  door:(%d,%d)\n", player.x(), player.y(), door.x(), door.y());
-//		else if (keyboard.key() == keyboard.E)
-//			player.move(0,-Player.MOVE_SPEED);
-//		else if (keyboard.key() == keyboard.D)
-//			player.move(0,Player.MOVE_SPEED);
 	}
+
+	
+	/**
+	 * Does nothing yet.  Only keeps exceptions from being thrown when a
+	 * key is pressed in this screen.
+	 */
 	public void onKeyPressScore()
 	{
-//		if (keyboard.isDown(arg0))
 	}
-	
+
+
+
 	////////////////////////////////////////////////////////////////////////////
 	// ----------------------------- Stages --------------------------------- //
+	////////////////////////////////////////////////////////////////////////////
+
 	////////////////////////////////////////////////////////////////////////////
 	
 	/**
 	 * The abstract way to store the makeup of a stage.
 	 */
+	
+	/**
+	 * The abstract representation of a stage.  This includes the start positions
+	 * of the player, goal, and pooper, as well as the positions of all the
+	 * bricks and platforms that make up the stage.
+	 */
 	private class Stage
 	{
-		private Brick[] bricks;
-		private Platform[] platforms;
-		private Player player;
-		private Door door;
-		private Pooper pooper;
+		private Brick[] bricks;        // Bricks in the stage.
+		private Platform[] platforms;  // Platforms.
+		private Player player;         // Player.
+		private Door door;             // Door/goal.
+		private Pooper pooper;         // cute animal-thing.
 		
-		private int numBricks;
-		private int numPlatforms;
+		private int numBricks;     // Count of bricks -- different than capacity.
+		private int numPlatforms;  // Count of platforms -- different than capacity.
 		
+		/**
+		 * Creates new Stage object.  Call other methods to alter this guy.
+		 */
 		public Stage()
 		{
 			bricks = new Brick[10];
@@ -198,6 +254,12 @@ public class CheeseHead extends Ucigame
 			numPlatforms = 0;
 		}
 		
+		/**
+		 * Adds a new brick at (x,y).
+		 * 
+		 * @param x x-coord of the new brick.
+		 * @param y y-coord of the new brick.
+		 */
 		public void addBrick(int x, int y)
 		{
 			if (numBricks >= bricks.length)
@@ -209,6 +271,12 @@ public class CheeseHead extends Ucigame
 			}			bricks[numBricks++] = new Brick(x,y);
 		}
 		
+		/**
+		 * Adds a new platform at (x,y).
+		 * 
+		 * @param x x-coord of the new Platform.
+		 * @param y y-coord of the new Platform.
+		 */
 		public void addPlatform(int x, int y)
 		{
 			if (numPlatforms >= platforms.length)
@@ -220,22 +288,46 @@ public class CheeseHead extends Ucigame
 			}
 			platforms[numPlatforms++] = new Platform(x,y);
 		}
-		
+
+		/**
+		 * Set's the player's start position to (x,y).  Calling this method
+		 * makes the stage overwrite the old position.
+		 * 
+		 * @param x X-coord of the player's start pos.
+		 * @param y Y-coord of the player's start pos.
+		 */
 		public void setPlayer(int x, int y)
 		{
 			player = new Player(x,y);
 		}
 		
+		/**
+		 * Set's pooper's start position to (x,y).  Calling this method
+		 * makes the stage overwrite pooper's old position.
+		 * 
+		 * @param x X-coord of the player's start pos.
+		 * @param y Y-coord of the player's start pos.
+		 */
 		public void setPooper(int x, int y)
 		{
 			pooper = new Pooper(x,y);
 		}
-		
+
+		/**
+		 * Set's the goal's start position to (x,y).  Calling this method
+		 * makes the stage overwrite the goal's old position.
+		 * 
+		 * @param x X-coord of the goal's start position.
+		 * @param y Y-coord of the goal's start position.
+		 */
 		public void setDoor(int x, int y)
 		{
 			door = new Door(x, y);
 		}
 		
+		/**
+		 * Draws this stage and all it's components.
+		 */
 		public void draw()
 		{
 			for (int i = 0; i < numBricks; i++)
@@ -252,6 +344,12 @@ public class CheeseHead extends Ucigame
 		public Pooper pooper() { return pooper; }
 		public int numBricks() { return numBricks; }
 		public int numPlatforms() { return numPlatforms; }
+		
+		/**
+		 * Creates and returns a correctly-sized array of bricks.
+		 * 
+		 * @return The bricks in this stage.
+		 */
 		public Brick[] bricks()
 		{
 			Brick[] temp = new Brick[numBricks];
@@ -259,6 +357,12 @@ public class CheeseHead extends Ucigame
 				temp[i] = bricks[i];
 			return temp;
 		}
+		
+		/**
+		 * Creates and returns a correctly-sized array of platforms.
+		 * 
+		 * @return The platforms in this stage.
+		 */
 		public Platform[] platforms()
 		{
 			Platform[] temp = new Platform[numPlatforms];
@@ -269,10 +373,14 @@ public class CheeseHead extends Ucigame
 	}
 	
 	
+	
 	////////////////////////////////////////////////////////////////////////////
 	// ----------------------------- Player --------------------------------- //
 	////////////////////////////////////////////////////////////////////////////
 	
+	/**
+	 * The player/sprite that the user controls.
+	 */
 	private class Player
 	{
 		public static final int MOVE_SPEED = 5;
@@ -397,11 +505,6 @@ public class CheeseHead extends Ucigame
 			
 			grounded = false;
 		}
-			
-//		private boolean approxEquals(double a, double b)
-//		{
-//			return Math.abs(a-b) <= yv;
-//		}
 		
 		private void move(int dx, int dy)
 		{
@@ -435,6 +538,11 @@ public class CheeseHead extends Ucigame
 		public void jump()
 		{
 			if (grounded) yv = JUMP_SPEED;
+		}
+		
+		public void down()
+		{
+			// TODO Fill me up.
 		}
 		
 		public int x()
@@ -543,6 +651,7 @@ public class CheeseHead extends Ucigame
 			return (stages[currentStage].player().x() < sprite.x() + 10 && stages[currentStage].player().x() > sprite.x() - 10 && stages[currentStage].player().y() + stages[currentStage].player().height() > sprite.y() + sprite.height() - 5 && stages[currentStage].player().y() + stages[currentStage].player().height() < sprite.y() + sprite.height() + 5);
 		}
 	}
+
 	
 	/**
 	 * The goal.
@@ -572,6 +681,7 @@ public class CheeseHead extends Ucigame
 			return (stages[currentStage].player().y() == sprite.y() + 10 && stages[currentStage].player().x() < sprite.x() + 20 && stages[currentStage].player().x() > sprite.x() - 20);
 		}
 	}
+
 	
 	/**
 	 * This is one of the bricks you see magically floating around.
@@ -585,6 +695,7 @@ public class CheeseHead extends Ucigame
 			sprite.position(x,y);
 		}
 	}
+
 	
 	/**
 	 * This is one of the platforms you see magically floating around.
@@ -598,6 +709,7 @@ public class CheeseHead extends Ucigame
 			sprite.position(x,y);
 		}
 	}
+
 	
 	/**
 	 * This wraps up a USprite object to make it easier (for me) to use.
