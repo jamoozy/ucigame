@@ -12,6 +12,10 @@ public class CheeseHead extends Ucigame
 //	private Door door;
 //	private Pooper pooper;
 
+	private Sprite startButton;
+	private Sprite restartButton;
+	private Sprite quitButton;
+
 	Stage[] stages;            // All stages.
 
 	private int frame;         // The frame we're on.
@@ -26,9 +30,14 @@ public class CheeseHead extends Ucigame
 		window.size(800,600);
 		window.title("Cheese Head");
 		canvas.background(0,125,255);
+
+		Image button = getImage("images/genericbutton.png");
+		startButton = makeButton("Start", button, 63, 16);
+		restartButton = makeButton("Restart", button, 63, 16);
+		quitButton = makeButton("Quit", button, 63, 16);
 		
 		frame = 0;
-		currentStage = 2;
+		currentStage = 0;
 		
 		stages = new Stage[3];
 		stages[0] = new Stage();
@@ -75,9 +84,37 @@ public class CheeseHead extends Ucigame
 		stages[2].addBrick(652, 404);
 		stages[2].addBrick(652, 436);
 		stages[2].addBrick(652, 468);
+
+		startScene("Menu");
+	}
+	
+	public void startMenu()
+	{
+		startButton.position(465, 200);
+		restartButton.position(465, 220);
+		quitButton.position(465, 240);
+		startButton.draw();
+		restartButton.draw();
+		quitButton.draw();
+	}
+	
+	public void onClickStart()
+	{
 		startScene("MainGame");
 	}
-
+	
+	public void onClickRestart()
+	{
+	}
+	
+	public void onClickQuit()
+	{
+		System.exit(0);
+	}
+	
+	public void drawMenu()
+	{
+	}
 	
 	/**
 	 * What to do when the player has reached the goal door.
@@ -89,25 +126,6 @@ public class CheeseHead extends Ucigame
 			startScene("Score");
 		
 	}
-
-//	void start()
-//	{
-//		bricks = new Brick[3];
-//		bricks[0] = new Brick(300,400);
-//		bricks[1] = new Brick(20, 30);
-//		bricks[2] = new Brick(80,90);
-//		
-//		platforms = new Platform[4];
-//		platforms[0] = new Platform(500,450);
-//		platforms[1] = new Platform(400,400);
-//		platforms[2] = new Platform(300,350);
-//		platforms[3] = new Platform(200,300);
-//		
-//		door = new Door(250, 229);
-//
-//		pooper = new Pooper(400,322);
-//
-//		player = new Player(20, 438);//	}
 
 	/**
 	 * Puts out the message at the end.
@@ -543,6 +561,15 @@ public class CheeseHead extends Ucigame
 		public void down()
 		{
 			// TODO Fill me up.
+			for (Platform p : stages[currentStage].platforms())
+			{
+				if (p.y() == y() + height() && x() + width() < p.x() && x() < p.x() + p.width())
+				{
+					grounded = false;
+					y++;
+					return;
+				}
+			}
 		}
 		
 		public int x()
