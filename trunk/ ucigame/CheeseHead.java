@@ -31,19 +31,22 @@ public class CheeseHead extends Ucigame
 		window.title("Cheese Head");
 		canvas.background(0,125,255);
 
-		Image button = getImage("images/genericbutton.png");
-		startButton = makeButton("Start", button, 63, 16);
-		restartButton = makeButton("Restart", button, 63, 16);
-		quitButton = makeButton("Quit", button, 63, 16);
+		Image start = getImage("images/startbutton.png");
+		Image restart = getImage("images/restartbutton.png");
+		Image quit = getImage("images/quitbutton.png");
+		startButton = makeButton("Start", start, start.width(), start.height()/3);
+		restartButton = makeButton("Restart", restart, restart.width(), restart.height()/3);
+		quitButton = makeButton("Quit", quit, quit.width(), quit.height()/3);
+		startButton.position(350, 200);
+		restartButton.position(350, 200);
+		quitButton.position(350, 340);
 		
 		frame = 0;
-		currentStage = 0;
+		currentStage = 2;
 		
 		stages = new Stage[3];
 		stages[0] = new Stage();
-		stages[0].setDoor(250, 229);
-		stages[0].setPlayer(20, 438);
-		stages[0].setPooper(400,322);		stages[0].addBrick(300,400);
+		stages[0].setDoor(250, 229);		stages[0].addBrick(300,400);
 		stages[0].addBrick(550, 300);
 		stages[0].addPlatform(500,450);
 		stages[0].addPlatform(400,400);
@@ -52,8 +55,6 @@ public class CheeseHead extends Ucigame
 
 		stages[1] = new Stage();
 		stages[1].setDoor(77, 9);
-		stages[1].setPooper(700, 472);
-		stages[1].setPlayer(20,438);
 		stages[1].addPlatform(20, 80);
 		stages[1].addPlatform(600, 400);
 		stages[1].addPlatform(600, 300);
@@ -64,8 +65,6 @@ public class CheeseHead extends Ucigame
 		
 		stages[2] = new Stage();
 		stages[2].setDoor(700,429);
-		stages[2].setPooper(372, 472);
-		stages[2].setPlayer(20, 439);
 		stages[2].addBrick(80, 468);
 		stages[2].addBrick(80, 436);
 		stages[2].addBrick(80, 404);
@@ -87,35 +86,32 @@ public class CheeseHead extends Ucigame
 
 		startScene("Menu");
 	}
-	
+
 	public void startMenu()
 	{
-		startButton.position(465, 200);
-		restartButton.position(465, 220);
-		quitButton.position(465, 240);
 		startButton.draw();
-		restartButton.draw();
 		quitButton.draw();
 	}
-	
+
+	public void drawMenu()
+	{
+	}
+
 	public void onClickStart()
 	{
 		startScene("MainGame");
 	}
-	
+
 	public void onClickRestart()
 	{
+		startScene("MainGame");
 	}
-	
+
 	public void onClickQuit()
 	{
 		System.exit(0);
 	}
-	
-	public void drawMenu()
-	{
-	}
-	
+
 	/**
 	 * What to do when the player has reached the goal door.
 	 */
@@ -133,11 +129,17 @@ public class CheeseHead extends Ucigame
 	public void startScore()
 	{
 		canvas.clear();
+		
+		restartButton.position(350, 200);
+		quitButton.position(350, 340);
+		
+		restartButton.draw();
+		quitButton.draw();
+
 		canvas.color(0);
-//		canvas.font("Arial", BOLD, 30);
+//		canvas.font("Courier", BOLD, 30);
 		canvas.putText("ehm ... you win?", 300, 300);
 	}
-	
 
 	/**
 	 * Updates the screen every frame during the score screen.
@@ -145,15 +147,27 @@ public class CheeseHead extends Ucigame
 	public void drawScore()
 	{
 	}
-	
 
 	/**
 	 * Init-type stuff for the main game.
 	 */
 	public void startMainGame()
 	{
+		if (currentStage >= stages.length) currentStage = 0;
+
+		startButton.position(900,700);
+		restartButton.position(900,700);
+		quitButton.position(900,700);
+
+		// Set these here because we may be replaying.
+		stages[0].setPlayer(20, 438);
+		stages[0].setPooper(400,322);
+		stages[1].setPlayer(20,438);
+		stages[1].setPooper(700, 472);
+		stages[2].setPlayer(20, 439);
+		stages[2].setPooper(372, 472);
 	}
-	
+
 
 	/**
 	 * Draws everything during normal gameplay.
@@ -172,7 +186,7 @@ public class CheeseHead extends Ucigame
 //		canvas.color(0);
 //		drawcross(20,438,10);
 	}
-	
+
 
 	/**
 	 * Draws a rectangle from (x1,y1) to (x2,y2).
@@ -187,7 +201,7 @@ public class CheeseHead extends Ucigame
 		for (int i = y1; i <= y2; i++)
 			canvas.line(x1, i, x2, i);
 	}
-	
+
 
 	/**
 	 * Draws a cross at (x,y) with a size of 2lx2l.
@@ -201,6 +215,7 @@ public class CheeseHead extends Ucigame
 		canvas.line(x-l, y, x+l, y);
 		canvas.line(x, y-l, x, y+l);
 	}
+
 
 	/**
 	 * Control the player sprite.  F or LEFT moves left.  S or RIGHT moves right
@@ -220,10 +235,11 @@ public class CheeseHead extends Ucigame
 		} if (keyboard.isDown(keyboard.D, keyboard.DOWN)) {
 //			System.out.println("down");
 			stages[currentStage].player().down();
-		}
+		} if (keyboard.isDown(keyboard.Q))
+			System.exit(0);
 	}
 
-	
+
 	/**
 	 * Does nothing yet.  Only keeps exceptions from being thrown when a
 	 * key is pressed in this screen.
@@ -238,12 +254,7 @@ public class CheeseHead extends Ucigame
 	// ----------------------------- Stages --------------------------------- //
 	////////////////////////////////////////////////////////////////////////////
 
-	////////////////////////////////////////////////////////////////////////////
-	
-	/**
-	 * The abstract way to store the makeup of a stage.
-	 */
-	
+
 	/**
 	 * The abstract representation of a stage.  This includes the start positions
 	 * of the player, goal, and pooper, as well as the positions of all the
@@ -316,7 +327,10 @@ public class CheeseHead extends Ucigame
 		 */
 		public void setPlayer(int x, int y)
 		{
-			player = new Player(x,y);
+			if (player == null)
+				player = new Player(x,y);
+			else
+				player.set(x,y);
 		}
 		
 		/**
@@ -328,7 +342,10 @@ public class CheeseHead extends Ucigame
 		 */
 		public void setPooper(int x, int y)
 		{
-			pooper = new Pooper(x,y);
+			if (pooper == null)
+				pooper = new Pooper(x,y);
+			else
+				pooper.set(x,y);
 		}
 
 		/**
@@ -340,7 +357,10 @@ public class CheeseHead extends Ucigame
 		 */
 		public void setDoor(int x, int y)
 		{
-			door = new Door(x, y);
+			if (door == null)
+				door = new Door(x, y);
+			else
+				door.set(x, y);
 		}
 		
 		/**
@@ -396,6 +416,7 @@ public class CheeseHead extends Ucigame
 	// ----------------------------- Player --------------------------------- //
 	////////////////////////////////////////////////////////////////////////////
 	
+
 	/**
 	 * The player/sprite that the user controls.
 	 */
@@ -404,6 +425,7 @@ public class CheeseHead extends Ucigame
 		public static final int MOVE_SPEED = 5;
 		public static final int JUMP_SPEED = -10;
 		
+		// Sprites are stored separately to get multiple animations.
 		private Sprite face;
 //		private USprite side;
 		private Sprite jump;
@@ -560,10 +582,9 @@ public class CheeseHead extends Ucigame
 		
 		public void down()
 		{
-			// TODO Fill me up.
 			for (Platform p : stages[currentStage].platforms())
 			{
-				if (p.y() == y() + height() && x() + width() < p.x() && x() < p.x() + p.width())
+				if (p.y() == y() + height() && x() + width() > p.x() && x() < p.x() + p.width())
 				{
 					grounded = false;
 					y++;
@@ -581,7 +602,13 @@ public class CheeseHead extends Ucigame
 		{
 			return (int)Math.round(y);
 		}
-	
+
+		public void set(int x, int y)
+		{
+			this.x = x;
+			this.y = y;
+		}
+
 		public int width()
 		{
 			return face.width();
@@ -627,7 +654,7 @@ public class CheeseHead extends Ucigame
 			// Make enough slots for one frame (equal to the number of frames per sec)
 			px = new int[FPS];
 			py = new int[FPS];
-			for (int i = 0; i < FPS; i++)
+			for (int i = 0; i < px.length; i++)
 			{
 				px[i] = -1;
 				py[i] = -1;
@@ -649,7 +676,7 @@ public class CheeseHead extends Ucigame
 					if (frameOfFirstContact == -100) {
 						System.out.println("Ticking...");
 						frameOfFirstContact = frame;
-					} else if (frame - frameOfFirstContact >= FPS * 2) {
+					} else if (frame - frameOfFirstContact >= FPS/2) {
 						System.out.println("Attached!");
 						attached = true;
 					}
@@ -678,7 +705,6 @@ public class CheeseHead extends Ucigame
 			return (stages[currentStage].player().x() < sprite.x() + 10 && stages[currentStage].player().x() > sprite.x() - 10 && stages[currentStage].player().y() + stages[currentStage].player().height() > sprite.y() + sprite.height() - 5 && stages[currentStage].player().y() + stages[currentStage].player().height() < sprite.y() + sprite.height() + 5);
 		}
 	}
-
 	
 	/**
 	 * The goal.
@@ -697,19 +723,20 @@ public class CheeseHead extends Ucigame
 		
 		public void draw()
 		{
-			if (playerHasArrive())
+			if (pooperHasArrived())
 				stageComplete();
 			else
 				super.draw();
 		}
 		
-		private boolean playerHasArrive()
+		private boolean pooperHasArrived()
 		{
-			return (stages[currentStage].player().y() == sprite.y() + 10 && stages[currentStage].player().x() < sprite.x() + 20 && stages[currentStage].player().x() > sprite.x() - 20);
+			return (stages[currentStage].pooper().y() + stages[currentStage].pooper().height() == sprite.y() + sprite.height() && stages[currentStage].pooper().x() < sprite.x() + 20 && stages[currentStage].pooper().x() > sprite.x() - 20);
 		}
 	}
 
 	
+
 	/**
 	 * This is one of the bricks you see magically floating around.
 	 * @author Andrew Correa
@@ -759,6 +786,11 @@ public class CheeseHead extends Ucigame
 		public int y()
 		{ 
 			return sprite.y();
+		}
+		
+		public void set(int x, int y)
+		{
+			sprite.position(x, y);
 		}
 		
 		public int width()
