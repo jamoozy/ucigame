@@ -46,7 +46,7 @@ public class CheeseHead extends Ucigame
 		
 		stages = new Stage[3];
 		stages[0] = new Stage();
-		stages[0].setDoor(250, 229);		stages[0].addBrick(300,400);
+		stages[0].setDoor(250, 229);		stages[0].addBrick(300,400);
 		stages[0].addBrick(550, 300);
 		stages[0].addPlatform(500,450);
 		stages[0].addPlatform(400,400);
@@ -120,7 +120,6 @@ public class CheeseHead extends Ucigame
 //		System.out.println("Arrived at the goal!!!");
 		if (++currentStage >= stages.length)
 			startScene("Score");
-		
 	}
 
 	/**
@@ -267,7 +266,7 @@ public class CheeseHead extends Ucigame
 		private Player player;         // Player.
 		private Door door;             // Door/goal.
 		private Pooper pooper;         // cute animal-thing.
-		
+
 		private int numBricks;     // Count of bricks -- different than capacity.
 		private int numPlatforms;  // Count of platforms -- different than capacity.
 		
@@ -297,7 +296,7 @@ public class CheeseHead extends Ucigame
 				for (int i = 0; i < bricks.length; i++)
 					temp[i] = bricks[i];
 				bricks = temp;
-			}			bricks[numBricks++] = new Brick(x,y);
+			}			bricks[numBricks++] = new Brick(x,y);
 		}
 		
 		/**
@@ -424,19 +423,19 @@ public class CheeseHead extends Ucigame
 	{
 		public static final int MOVE_SPEED = 5;
 		public static final int JUMP_SPEED = -10;
-		
+
 		// Sprites are stored separately to get multiple animations.
 		private Sprite face;
 //		private USprite side;
 		private Sprite jump;
 		private Sprite walk;
-		
+
 		private double x, y;          // coordinates of the player.
 		private double yv;            // y-velocity
 		private boolean grounded;     // Are we standing or in mid-air?
 		private boolean moving;       // Are we currently moving (in this frame)?
 		private boolean leftNOTright; // The only way I could get the jump to look right...
-		
+
 		public Player(int x, int y)
 		{
 			Image walkimage = getImage("images/playerwalk.png", 192);
@@ -453,7 +452,7 @@ public class CheeseHead extends Ucigame
 			grounded = false;
 			moving = false;
 		}
-	
+
 		public void draw()
 		{
 			checkCollisions();
@@ -466,10 +465,10 @@ public class CheeseHead extends Ucigame
 //			} else {
 //				grounded = false;
 //			}
-			
+
 			y += yv;  // Take velocity into account;
 			yv += G;  // Adjust for gravity
-			
+
 			// Play the appropriate animation or show the correct frame given
 			// the state of the player.
 			if (!grounded) {
@@ -488,10 +487,10 @@ public class CheeseHead extends Ucigame
 				face.position(x, y);
 				face.draw();
 			}
-			
+
 			moving = false;
 		}
-		
+
 		private void checkCollisions()
 		{
 			if (y >= FLOOR - face.height() && yv > 0)
@@ -503,7 +502,7 @@ public class CheeseHead extends Ucigame
 				yv = 0;
 				return;
 			}
-			
+
 			for (Platform p : stages[currentStage].platforms()) if (p.x() < x + face.width() && p.x() + p.width() > x && yv > 0 && p.y() >= y + face.height() && p.y() < y() + height() + yv)
 			{
 //				System.out.println("platform-foot collision");
@@ -545,7 +544,7 @@ public class CheeseHead extends Ucigame
 			
 			grounded = false;
 		}
-		
+
 		private void move(int dx, int dy)
 		{
 			moving = true;
@@ -560,14 +559,14 @@ public class CheeseHead extends Ucigame
 			this.x += dx;
 			this.y += dy;
 		}
-		
+
 		public void moveLeft()
 		{
 			if (x - MOVE_SPEED > 0)
 				move(-MOVE_SPEED, 0);
 			leftNOTright = true;
 		}
-		
+
 		public void moveRight()
 		{
 			if (x + face.width() + MOVE_SPEED < 800)
@@ -579,7 +578,7 @@ public class CheeseHead extends Ucigame
 		{
 			if (grounded) yv = JUMP_SPEED;
 		}
-		
+
 		public void down()
 		{
 			for (Platform p : stages[currentStage].platforms())
@@ -592,12 +591,12 @@ public class CheeseHead extends Ucigame
 				}
 			}
 		}
-		
+
 		public int x()
 		{
 			return (int)Math.round(x);
 		}
-		
+
 		public int y()
 		{
 			return (int)Math.round(y);
@@ -613,7 +612,7 @@ public class CheeseHead extends Ucigame
 		{
 			return face.width();
 		}
-		
+
 		public int height()
 		{
 			return face.height();
